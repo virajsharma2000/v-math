@@ -1,6 +1,7 @@
 # neccessary dependencies
 from decimal import Decimal
 import turtle
+from pandas import Series
 
 # for patenting my name 
 print("Thanks for using mathematics module created by viraj sharma to view source code goto https://github.com/virajsharma2000/python_apps/blob/main/mathematics.py")
@@ -145,7 +146,35 @@ mathematicians = {
     }
 }
 
-# constant pi value
+# dictnoary of devanrangi digits
+devarangi_numbers = {
+    0: '०',  # शून्य (Shunya)
+    1: '१',  # एक (Ek)
+    2: '२',  # दो (Do)
+    3: '३',  # तीन (Teen)
+    4: '४',  # चार (Chaar)
+    5: '५',  # पाँच (Paanch)
+    6: '६',  # छह (Chhah)
+    7: '७',  # सात (Saat)
+    8: '८',  # आठ (Aath)
+    9: '९'   # नौ (Nau)
+}
+
+# reversed devarangi number
+reversed_devarangi_numbers = {
+    '०': 0,  # Shunya
+    '१': 1,  # Ek
+    '२': 2,  # Do
+    '३': 3,  # Teen
+    '४': 4,  # Chaar
+    '५': 5,  # Paanch
+    '६': 6,  # Chhah
+    '७': 7,  # Saat
+    '८': 8,  # Aath
+    '९': 9   # Nau
+}
+
+# constant pi value 
 pi_value = 3.141592653589793
 
 # keprekar's constant
@@ -173,10 +202,8 @@ def cube(number):
 
 # calculates that the number is perfect square or not
 def is_perfect_square(number):
-    if number < 0:
-        return False  # Negative numbers can't be perfect squares
-    sqrt = int(number ** 0.5)
-    return sqrt * sqrt == number
+ return number ** 0.5 == int(number ** 0.5)
+
 # calculates that the cube is perfect cube or not
 def is_perfect_cube(number):
  return number ** 0.3333333333333333 == int(number ** 0.3333333333333333)
@@ -218,19 +245,24 @@ def is_it_triangle(x,y,z):
  return is_it_triangle
 
 # finds the base raised to a given power 
-def base(exponent, value):
-    base = 0
-    number = value
+def base(exponent,value):
+ base = 0
+ number = 0
 
-    while number >= 1:
-        number = number / exponent
-        base += 1
+ while number > 1 or number == 0:
+  if number == 0:
+   number = value / exponent
+   base += 1
 
-    if (base - 1) ** exponent == value:
-        return base - 1
-    else:
-        raise ValueError('No base found for {} and {}'.format(exponent, value))
+  else:
+   number = number / exponent
+   base += 1
 
+ if base ** exponent == value:
+  return base
+
+ else:
+  raise ValueError('no base found for {} and {}'.format(exponent,value))
 
 # calculates circumfrence
 def circumfrence(diameter):
@@ -504,6 +536,23 @@ def seperate_digits_of_number(n, seperator = ','):
  else:
   return "0"
 
+# converts integer to devrangi number
+def convert_to_devarangi_number(number):
+ devarangi_number = ''
+ 
+ for digit in split_into_digits(number):
+  devarangi_number += devarangi_numbers.get(digit)
+
+ return devarangi_number
+
+def convert_to_english_number(devarangi_number):
+ number = 0
+
+ for digit in devarangi_number:
+  number = number * 10 + reversed_devarangi_numbers.get(digit)
+
+ return number
+ 
 # gets the number of cuts in a circle to break circle to number of pieces
 def minimum_cuts(number_of_pieces_to_break):
  if number_of_pieces_to_break > 1:
@@ -542,7 +591,7 @@ def expanded_form(number):
 # gets the lcm of the number
 def lcm(number1, number2):
  return (number1 * number2) // hcf(number1, number2)
-  
+
 # performs all operations on fraction and has some more features of fraction
 class Fraction:
  def __init__(self, fraction):
@@ -680,9 +729,15 @@ class Expression:
  def __init__(self, expression):
   self.expression = expression
 
+  self.constants = 0
+  self.numbers = 0
+
+  for char in expression:
+   self.constants += char.isalpha()
+  
  # splits expression into terms
  def split_into_terms(self):
-  expression = self.expression.replace(' ', '')
+  expression = self.expression.replace(' ', '').replace('(', '').replace(')', '')
  
   terms_list = []
   idx = 0
@@ -697,7 +752,7 @@ class Expression:
 
    else:
     terms_list.append(charecter)
-
+    
   return terms_list
 
  # checks that the 2 terms are like terms or not
@@ -777,14 +832,18 @@ class Expression:
   self.expression = self.expression.replace(' ', '')
   
   expression = ''
+  
+  splitted_expression = self.expression.split(')')
+
+  expression_outside_paranthesis = splitted_expression[len(splitted_expression) - 1] 
 
   if self.expression[0] == '(':
    common = self.expression.split(')(')[0] + ')'
-   expression_inside_paranthesis = self.expression.split(')(')[1].replace(')', '')
+   expression_inside_paranthesis = self.expression.split(')(')[1].split(')')[0]
 
   else:
    common = self.expression.split('(')[0]
-   expression_inside_paranthesis = self.expression.split('(')[1].replace(')', '')
+   expression_inside_paranthesis = self.expression.split('(')[1].split(')')[0]
 
   for term in Expression(expression_inside_paranthesis).split_into_terms():
    if not term.startswith('+') and not term.startswith('-'):
@@ -806,8 +865,8 @@ class Expression:
 
     else:
      expression += term[0] + common + '*' + term.replace(term[0], '') 
-     
-  return Expression(expression)
+  
+  return Expression(expression + expression_outside_paranthesis)
     
 # has few features related to time like convert it to text representation or convert 24 hour time to 12 hour time or calculate difference between two times
 class Time:
@@ -842,7 +901,6 @@ class Time:
 
    else:
     to = number_names.get(60 - self.minute)
-    print(number_names.get(60 - self.minute))
 
   elif self.minute > 0:
    past = number_names.get(self.minute)
@@ -1091,6 +1149,51 @@ def can_form_linear_graph(data):
   differences.append(data[i + 1] - data[i])
 
  return sum(differences) == differences[0] * len(differences)
+
+# predicts data using direct and inverse proportions (using pandas df object) and returns in pandas series object
+def predict_y(df, column_x_data):
+ cols = df.columns
+
+ direct_proportion_ratios = []
+ inverse_proportion_ratios = []
+ 
+ for num1, num2 in zip(df[cols[0]], df[cols[1]]):
+  direct_proportion_ratios.append(num1 / num2)
+  inverse_proportion_ratios.append(num1 * num2)
+
+ if direct_proportion_ratios[0] * len(direct_proportion_ratios) == sum(direct_proportion_ratios):
+  x = df[cols[0]][len(df[cols[0]]) - 1]
+  y = df[cols[1]][len(df[cols[0]]) - 1]
+
+  column_y_data = []
+
+  for num in column_x_data:
+   column_y_data.append((num * y) / x)
+
+  return Series(data = column_y_data)
+
+ elif inverse_proportion_ratios[0] * len(inverse_proportion_ratios) == sum(inverse_proportion_ratios):
+  x = df[cols[0]][len(df[cols[0]]) - 1]
+  y = df[cols[1]][len(df[cols[0]]) - 1]
+
+  column_y_data = []
+
+  for num in column_x_data:
+   column_y_data.append((x * y) / num)
+
+  return Series(data = column_y_data) 
+  
+ else:
+  raise ValueError('data not in proportion')
+
+# converts the solar years to divine years
+def solar_years_to_divine_years(years):
+ return years * 360
+
+# converts divine years to solar years
+def divine_years_to_solar_years(years):
+ return years / 360
+ 
 
 
 
